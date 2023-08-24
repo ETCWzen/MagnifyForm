@@ -14,15 +14,24 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/create', function (){
     return view('create');
 });
-Route::post('/create', function(){
-    $article = new Article();
-    $article ->title= request('title');
-    $article ->body= request('body');
-    $article ->save();
-});
+Route::post('/create', function (CreateEmployeeRequest $request) {
+    Employee::create([
+        'name' => $request->get('name'),
+        'email' => $request->get('email'),
+        'department' => $request->get('department'),
+    ]);
+
+    return redirect(route('home'));
+})->name('employee.create');
+
+Route::post('/lookup', function (Request $request) {
+    $email = $request->get('lookupEmail');
+    return view('home', [
+        'employees' => Employee::where('email', 'like', $email . "%")->get()
+    ]);
+})->name('employee.lookup');
+
+
+
